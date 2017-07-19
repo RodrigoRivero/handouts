@@ -25,29 +25,28 @@ counts_spread <- spread(counts_gather,
 
 ## Read comma-separated-value (CSV) files
 
-animals <- ...
-
-animals <- read.csv('data/animals.csv', )
+animals <- read.csv('data/animals.csv' )
+str(animals)
 
 library(dplyr)
-library(...)
+library(RPostgreSQL)
 
-con <- ...(..., host = 'localhost', dbname = 'portal')
-animals_db <- ...
-animals <- ...
-dbDisconnect(...)
+con <- dbConnect(PostgreSQL(), host = 'localhost', dbname = 'portal')
+animals_db <- tbl(con, 'animals')
+animals <- collect(animals_db)
+dbDisconnect(con)
 
 ## Subsetting and sorting
 
 library(dplyr)
-animals_1990_winter <- filter(...,
-                              ...,
-                              ...)
+animals_1990_winter <- filter(animals,
+                              year == 1990,
+                              month %in% 1:3)
 
-animals_1990_winter <- select(animals_1990_winter, ...)
+animals_1990_winter <- select(animals_1990_winter, -year)
 
-sorted <- ...(animals_1990_winter,
-              ...)
+sorted <- arrange(animals_1990_winter,
+              desc(species_id), weight)
 
 ## Exercise 2
 
@@ -61,7 +60,10 @@ counts_1990_winter <- summarize(..., count = n())
 
 ## Exercise 3
 
-...
+dms <- filter( animals, species_id == "DM")
+dms <- group_by(animals_dm, month)
+sol3 <- summarize(dms, avg_wgt = mean(weight, na.rm = TRUE),
+                  avg_hfl = mean(hindfoot_length, na.rm = TRUE))
 
 ## Pivot tables through aggregate and spread
 
