@@ -1,37 +1,37 @@
 ## Importing vector data
 
-library(...)
-library(...)
+library(sf)
+library(rgdal)
 
 shp <- 'data/cb_2016_us_county_5m'
-counties <- ...(..., stringsAsFactors = FALSE)
-
+counties <- st_read(shp, stringsAsFactors = FALSE)
+class(counties)
+names(counties)
 ## Bounding box
 
-library(...)
-counties_md <- ...
+library(dplyr)
+counties_md <- filter(counties, STATEFP == "24")
 
 ## Grid
-
-... <- ...(counties_md, ...)
+grid_md <- st_make_grid(counties_md, n = 4)
 
 
 ## Plot layers
 
-plot(...)
-plot(...)
+plot(grid_md)
 
 ## Create geometry
 
-sesync <- ...(
-    ...(c(-76.503394, 38.976546)),
-        ...)
+sesync <- st_sfc(
+    st_point(c(-76.503394, 38.976546)),
+        crs = 4326)
 
 
-counties_md <- ...(counties_md, ...)
-plot(...)
-plot(..., col = "green", pch = 20, add = ...)
+counties_md <- st_transform(counties_md, crs = st_crs(sesync))
+plot(counties_md$geometry)
+plot(sesync, col = "green", pch = 20, add = T)
 
+st_within(sesync, counties_md)
 ## Exercise 1
 
 ...
